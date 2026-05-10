@@ -243,7 +243,7 @@ I removed the failed container and started a new container using the correct app
 
 ```bash
 docker rm devops-practical-fail
-docker run -d --name devops-practical-debug -p 8000:8000 devops-practical-app uvicorn backend.main:app --host 0.0.0.0 --port 8000
+docker run -d --name devops-practical-fixed -p 8000:8000 devops-practical-app uvicorn backend.main:app --host 0.0.0.0 --port 8000
 ```
 
 Then I verified the application using the health check endpoint:
@@ -271,3 +271,102 @@ Container started successfully after using the correct module path:
 ### Explanation
 
 I used `docker ps -a` to check the stopped container, `docker logs` to view the startup error, and identified that the application module path was incorrect. After changing the command from `backend.wrong:app` to `backend.main:app`, the container started successfully and the health check returned `{"status":"ok"}`.
+
+## Question 6: Use Docker Compose to Manage a Multi-Container Setup
+
+### Files Created
+
+- `docker-compose.yml`: Defines the app and database services.
+- `.env.example`: Shows required database environment variables without exposing real secrets.
+
+### Services Used
+
+- `app`: FastAPI application built from the local `Dockerfile`.
+- `database`: PostgreSQL database using the `postgres:16-alpine` image.
+- `postgres_data`: Docker volume used to persist database data.
+
+### Docker Compose File
+
+```yaml
+services:
+  app:
+    build: .
+    container_name: devops-practical-app
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-devops_user}:${POSTGRES_PASSWORD:-devops_password}@database:5432/${POSTGRES_DB:-devops_db}
+    depends_on:
+      database:
+        condition: service_healthy
+    restart: unless-stopped
+
+  database:
+    image: postgres:16-alpine
+    container_name: devops-practical-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-devops_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-devops_password}
+      POSTGRES_DB: ${POSTGRES_DB:-devops_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+```
+
+### Commands Used
+
+If another container is already using port `8000`, stop it first:
+
+```bash
+docker rm -f devops-practical-fixed
+```
+
+Start the multi-container setup:
+
+```bash
+docker compose up --build
+```
+
+Check running services:
+
+```bash
+docker compose ps
+```
+
+Check logs:
+
+```bash
+docker compose logs app
+docker compose logs database
+```
+
+Verify the app:
+
+```bash
+curl http://localhost:8000/health
+curl http://localhost:8000/config
+```
+
+Stop the setup:
+
+```bash
+docker compose down
+```
+
+### Proof Screenshot
+
+Docker Compose running the FastAPI app and PostgreSQL database:
+
+<img src="screenshoot/docker-compose-running.png" alt="Docker Compose running app and database" width="600">
+
+### Explanation
+
+Docker Compose was used to manage a multi-container application. The `app` service runs the FastAPI application, and the `database` service runs PostgreSQL. The app waits for the database health check before starting because of `depends_on` with `condition: service_healthy`. The database data is stored in a named Docker volume called `postgres_data`, so data can persist even if the database container is recreated.

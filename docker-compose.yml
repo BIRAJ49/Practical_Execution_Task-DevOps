@@ -1,0 +1,31 @@
+services:
+  app:
+    build: .
+    container_name: devops-practical-app
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-devops_user}:${POSTGRES_PASSWORD:-devops_password}@database:5432/${POSTGRES_DB:-devops_db}
+    depends_on:
+      database:
+        condition: service_healthy
+    restart: unless-stopped
+
+  database:
+    image: postgres:16-alpine
+    container_name: devops-practical-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-devops_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-devops_password}
+      POSTGRES_DB: ${POSTGRES_DB:-devops_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

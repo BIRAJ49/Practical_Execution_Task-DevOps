@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -23,3 +24,11 @@ def home():
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+@app.get("/config")
+def config():
+    return {
+        "database_configured": bool(os.getenv("DATABASE_URL")),
+        "database_host": "database",
+    }
