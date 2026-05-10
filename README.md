@@ -198,3 +198,76 @@ Docker container running successfully:
 ### Explanation
 
 The Dockerfile creates a lightweight image for the FastAPI application. The app serves the static `frontend/index.html` page through `backend/main.py` on port `8000` and provides a `/health` endpoint for container checks. The image is optimized by using a slim Python base image, excluding unnecessary files, installing dependencies without cache, and running the application as a non-root user.
+
+## Question 5: Run a Container and Debug Issue if the Application Fails to Start
+
+### Scenario
+
+To simulate a container startup failure, I ran the image with an incorrect FastAPI module path:
+
+```bash
+docker run --name devops-practical-fail devops-practical-app uvicorn backend.wrong:app --host 0.0.0.0 --port 8000
+```
+
+### Debugging Commands Used
+
+```bash
+docker ps -a
+docker logs devops-practical-fail
+docker inspect devops-practical-fail
+```
+
+### Error Found
+
+```text
+ERROR: Error loading ASGI app. Could not import module "backend.wrong".
+```
+
+### Root Cause
+
+The container failed because the startup command used the wrong module path:
+
+```text
+backend.wrong:app
+```
+
+The actual FastAPI application is located in:
+
+```text
+backend.main:app
+```
+
+### Fix Applied
+
+I removed the failed container and started a new container using the correct application path:
+
+```bash
+docker rm devops-practical-fail
+docker run -d --name devops-practical-debug -p 8000:8000 devops-practical-app uvicorn backend.main:app --host 0.0.0.0 --port 8000
+```
+
+Then I verified the application using the health check endpoint:
+
+```bash
+curl http://localhost:8000/health
+```
+
+Expected output:
+
+```json
+{"status":"ok"}
+```
+
+### Proof Screenshots
+
+Container failed because of the wrong FastAPI module path:
+
+<img src="screenshoot/container-failed-debug.png" alt="Container failed debug output" width="600">
+
+Container started successfully after using the correct module path:
+
+<img src="screenshoot/container-fixed-health-check.png" alt="Container fixed health check" width="600">
+
+### Explanation
+
+I used `docker ps -a` to check the stopped container, `docker logs` to view the startup error, and identified that the application module path was incorrect. After changing the command from `backend.wrong:app` to `backend.main:app`, the container started successfully and the health check returned `{"status":"ok"}`.
