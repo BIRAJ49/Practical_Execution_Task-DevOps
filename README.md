@@ -2,9 +2,12 @@
 
 This repository contains the work completed for the DevOps practical examination.
 
-## Project File
+## Project Structure
 
-- `index.html`: A simple HTML web page containing a heading, paragraph, list, link, and button.
+- `frontend/index.html`: A simple HTML web page containing a heading, paragraph, list, link, and button.
+- `backend/main.py`: FastAPI backend application.
+- `backend/requirements.txt`: Python dependencies for the backend.
+- `Dockerfile`: Container image definition for the application.
 
 ## Question 1: Initialize a Git Repository and Push Code to GitHub
 
@@ -130,8 +133,9 @@ The conflict happened because two branches changed the same line in `index.html`
 
 ### Files Created
 
-- `main.py`: Simple FastAPI application that serves `index.html`.
-- `requirements.txt`: Contains Python dependencies.
+- `backend/main.py`: Simple FastAPI application that serves `frontend/index.html`.
+- `backend/requirements.txt`: Contains Python dependencies.
+- `frontend/index.html`: Static frontend page served by FastAPI.
 - `Dockerfile`: Builds the application container image.
 - `.dockerignore`: Removes unnecessary files from the Docker build context.
 
@@ -147,17 +151,17 @@ ENV PYTHONUNBUFFERED=1
 
 RUN adduser --disabled-password --gecos "" appuser
 
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY --chown=appuser:appuser main.py .
-COPY --chown=appuser:appuser index.html .
+COPY --chown=appuser:appuser backend ./backend
+COPY --chown=appuser:appuser frontend ./frontend
 
 USER appuser
 
 EXPOSE 8000
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
 ### Commands Used
@@ -179,4 +183,4 @@ docker run -p 8000:8000 devops-practical-app
 
 ### Explanation
 
-The Dockerfile creates a lightweight image for the FastAPI application. The app serves the static `index.html` page through `main.py` on port `8000` and provides a `/health` endpoint for container checks. The image is optimized by using a slim Python base image, excluding unnecessary files, installing dependencies without cache, and running the application as a non-root user.
+The Dockerfile creates a lightweight image for the FastAPI application. The app serves the static `frontend/index.html` page through `backend/main.py` on port `8000` and provides a `/health` endpoint for container checks. The image is optimized by using a slim Python base image, excluding unnecessary files, installing dependencies without cache, and running the application as a non-root user.

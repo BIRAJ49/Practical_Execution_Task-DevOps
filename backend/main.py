@@ -6,7 +6,7 @@ from fastapi.responses import FileResponse, JSONResponse
 app = FastAPI(title="DevOps Practical App")
 
 BASE_DIR = Path(__file__).resolve().parent
-INDEX_FILE = BASE_DIR / "index.html"
+INDEX_FILE = BASE_DIR.parent / "frontend" / "index.html"
 
 
 @app.get("/")
