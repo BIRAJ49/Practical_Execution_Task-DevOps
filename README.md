@@ -121,7 +121,7 @@ Resolve homepage heading merge conflict
 Document merge conflict resolution steps
 ```
 
-### Proof Screenshot
+### Screenshot
 
 ![Merge conflict proof](screenshoot/merge-conflict-proof.png)
 
@@ -185,7 +185,7 @@ docker run -p 8000:8000 devops-practical-app
 - Used `--no-create-home` to avoid creating an unnecessary home directory for the container user.
 - Used `COPY --chown=appuser:appuser` so files are owned by the non-root user.
 
-### Proof Screenshots
+### Screenshots
 
 Docker image build completed successfully:
 
@@ -258,7 +258,7 @@ Expected output:
 {"status":"ok"}
 ```
 
-### Proof Screenshots
+### Screenshots
 
 Container failed because of the wrong FastAPI module path:
 
@@ -361,7 +361,7 @@ Stop the setup:
 docker compose down
 ```
 
-### Proof Screenshot
+### Screenshot
 
 Docker Compose running the FastAPI app and PostgreSQL database:
 
@@ -431,7 +431,7 @@ python3 -m unittest discover -s backend -p "test_*.py"
 docker compose config
 ```
 
-### Proof Screenshot
+### Screenshot
 
 GitHub Actions CI pipeline completed successfully:
 
@@ -509,7 +509,7 @@ Run the deployment script:
 ./scripts/deploy.sh
 ```
 
-### Proof Screenshot
+### Screenshot
 
 Deployment automation script completed successfully:
 
@@ -581,7 +581,7 @@ Expected output:
 }
 ```
 
-### Proof Screenshot
+### Screenshot
 
 Environment variables are configured securely and `.env` is ignored by Git:
 
@@ -658,7 +658,7 @@ Check Nginx logs:
 docker compose logs nginx
 ```
 
-### Proof Screenshot
+### Screenshot
 
 Nginx reverse proxy forwarding requests to the FastAPI backend:
 
@@ -684,7 +684,7 @@ https://devopspracticaltask.netlify.app
 4. Set the publish directory to `frontend`.
 5. Deployed the site and verified it in the browser.
 
-### Proof Screenshot
+### Screenshot
 
 Static frontend deployed successfully on Netlify:
 
@@ -901,7 +901,7 @@ jobs:
 - `test`: Installs dependencies and runs backend unit tests.
 - `deploy`: Runs only on the `main` branch after tests pass and simulates deployment.
 
-### Proof Screenshot
+### Screenshot
 
 CI/CD workflow completed successfully:
 
