@@ -693,3 +693,64 @@ Static frontend deployed successfully on Netlify:
 ### Explanation
 
 The static frontend was deployed on Netlify so it can be accessed publicly through a live URL. Netlify serves the `frontend/index.html` page as a static website, which is suitable for simple HTML, CSS, and JavaScript frontend deployments.
+
+## Question 12: Analyze System/Application Logs and Identify Potential Root Cause of Failures
+
+### File Created
+
+- `logs-analysis.md`: Contains log analysis notes, observations, possible root causes, and fixes.
+
+### Commands Used
+
+```bash
+docker compose ps
+docker compose logs app
+docker compose logs nginx
+docker compose logs database
+```
+
+### Application Log Observations
+
+The FastAPI app logs showed successful startup:
+
+```text
+Started server process
+Application startup complete
+Uvicorn running on http://0.0.0.0:8000
+```
+
+The app also showed successful requests:
+
+```text
+GET /health HTTP/1.1 200 OK
+GET /config HTTP/1.1 200 OK
+```
+
+### Nginx Log Observations
+
+The Nginx logs showed that the reverse proxy started successfully and forwarded requests:
+
+```text
+Configuration complete; ready for start up
+GET /health HTTP/1.1 200
+GET /config HTTP/1.1 200
+```
+
+### Potential Root Causes
+
+If the application fails, possible causes include:
+
+- FastAPI backend container is stopped or unhealthy.
+- Nginx is not running.
+- Nginx `proxy_pass` points to the wrong service or port.
+- Port `8080` or `8000` is already in use.
+- Database container is not healthy.
+- Required environment variables are missing.
+
+### Identified Result
+
+The logs showed successful startup and `200 OK` responses, so there was no current application failure. A harmless Nginx startup notice appeared because the mounted config file is read-only, but Nginx still started correctly and served requests.
+
+### Explanation
+
+I analyzed logs using `docker compose logs` for the app, Nginx, and database services. The logs helped confirm that containers started correctly and requests were successfully handled. If a failure occurred, these logs would help identify whether the issue was caused by the application, reverse proxy, database, port conflict, or missing environment variables.
