@@ -658,6 +658,12 @@ Check Nginx logs:
 docker compose logs nginx
 ```
 
+### Proof Screenshot
+
+Nginx reverse proxy forwarding requests to the FastAPI backend:
+
+<img src="screenshoot/nginx-reverse-proxy.png" alt="Nginx reverse proxy proof" width="600">
+
 ### Explanation
 
 Nginx runs as a separate container and acts as a reverse proxy in front of the FastAPI backend. Requests sent to `localhost:8080` are received by Nginx and forwarded internally to the `app` service at `http://app:8000`. This keeps the backend behind a proxy layer and demonstrates how production traffic can be routed through Nginx.
