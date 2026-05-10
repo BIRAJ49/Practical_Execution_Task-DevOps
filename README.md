@@ -26,7 +26,7 @@ First, I initialized a Git repository using `git init`. Then I added all project
 ### Example Commit Message
 
 ```bash
-Initial commit: add index.html page
+Initial commit: added index.html page
 ```
 
 ## Question 2: Create a Branching Strategy and Simulate Team Workflow
@@ -108,6 +108,19 @@ Then I added and committed the resolved file:
 git add index.html
 git commit -m "Resolve homepage heading merge conflict"
 ```
+
+### Commit Messages Used
+
+```bash
+Update heading from first conflict branch
+Update heading from second conflict branch
+Resolve homepage heading merge conflict
+Document merge conflict resolution steps
+```
+
+### Proof Screenshot
+
+![Merge conflict proof](screenshoot/merge-conflict-proof.png)
 
 ### Explanation
 
