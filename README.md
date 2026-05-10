@@ -370,3 +370,67 @@ Docker Compose running the FastAPI app and PostgreSQL database:
 ### Explanation
 
 Docker Compose was used to manage a multi-container application. The `app` service runs the FastAPI application, and the `database` service runs PostgreSQL. The app waits for the database health check before starting because of `depends_on` with `condition: service_healthy`. The database data is stored in a named Docker volume called `postgres_data`, so data can persist even if the database container is recreated.
+
+## Question 7: Set Up a CI Pipeline Using GitHub Actions to Build and Test Code
+
+### Files Created
+
+- `.github/workflows/ci.yml`: GitHub Actions workflow for continuous integration.
+- `backend/test_main.py`: Unit tests for the FastAPI application.
+
+### CI Workflow
+
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: Run tests
+        run: |
+          python -m unittest discover -s backend -p "test_*.py"
+
+      - name: Validate Docker Compose file
+        run: |
+          docker compose config
+
+      - name: Build Docker image
+        run: |
+          docker build -t devops-practical-app .
+```
+
+### Commands Used Locally
+
+```bash
+python3 -m unittest discover -s backend -p "test_*.py"
+docker compose config
+```
+
+### Explanation
+
+The CI pipeline runs automatically on pushes and pull requests to the `main` and `develop` branches. It checks out the code, installs Python dependencies, runs unit tests, validates the Docker Compose file, and builds the Docker image. This helps detect broken code, invalid Compose configuration, or Docker build failures before changes are merged.
