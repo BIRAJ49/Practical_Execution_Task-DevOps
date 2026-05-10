@@ -431,6 +431,12 @@ python3 -m unittest discover -s backend -p "test_*.py"
 docker compose config
 ```
 
+### Proof Screenshot
+
+GitHub Actions CI pipeline completed successfully:
+
+<img src="screenshoot/github-actions-ci.png" alt="GitHub Actions CI pipeline success" width="600">
+
 ### Explanation
 
 The CI pipeline runs automatically on pushes and pull requests to the `main` and `develop` branches. It checks out the code, installs Python dependencies, runs unit tests, validates the Docker Compose file, and builds the Docker image. This helps detect broken code, invalid Compose configuration, or Docker build failures before changes are merged.
