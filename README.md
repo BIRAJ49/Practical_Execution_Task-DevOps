@@ -4,7 +4,7 @@ This repository contains the work completed for the DevOps practical examination
 
 ## Project Structure
 
-- `frontend/index.html`: A simple HTML web page containing a heading, paragraph, list, link, and button.
+- `frontend/index.html`: A simple HTML web page containing a heading, paragraph, repository link, and button.
 - `backend/main.py`: FastAPI backend application.
 - `backend/requirements.txt`: Python dependencies for the backend.
 - `Dockerfile`: Container image definition for the application.
