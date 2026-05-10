@@ -130,48 +130,53 @@ The conflict happened because two branches changed the same line in `index.html`
 
 ### Files Created
 
-- `server.js`: Simple Node.js server that serves `index.html`.
-- `package.json`: Contains application metadata and start/test scripts.
+- `main.py`: Simple FastAPI application that serves `index.html`.
+- `requirements.txt`: Contains Python dependencies.
 - `Dockerfile`: Builds the application container image.
 - `.dockerignore`: Removes unnecessary files from the Docker build context.
 
 ### Dockerfile
 
 ```dockerfile
-FROM node:22-alpine
+FROM python:3.12-slim
 
 WORKDIR /app
 
-ENV NODE_ENV=production
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-COPY --chown=node:node package.json ./
-COPY --chown=node:node server.js ./
-COPY --chown=node:node index.html ./
+RUN adduser --disabled-password --gecos "" appuser
 
-USER node
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-EXPOSE 3000
+COPY --chown=appuser:appuser main.py .
+COPY --chown=appuser:appuser index.html .
 
-CMD ["node", "server.js"]
+USER appuser
+
+EXPOSE 8000
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
 ### Commands Used
 
 ```bash
 docker build -t devops-practical-app .
-docker run -p 3000:3000 devops-practical-app
+docker run -p 8000:8000 devops-practical-app
 ```
 
 ### Optimization Steps
 
-- Used `node:22-alpine`, which is smaller than a full Node.js image.
+- Used `python:3.12-slim`, which is smaller than a full Python image.
 - Copied only required files into the image.
 - Used `.dockerignore` to exclude Git files, screenshots, logs, environment files, and dependencies.
-- Set `NODE_ENV=production`.
-- Used the non-root `node` user for better container security.
-- Used `COPY --chown=node:node` so files are owned by the non-root user.
-- Avoided unnecessary dependencies, which keeps the image smaller.
+- Used `pip install --no-cache-dir` to avoid storing package cache in the image.
+- Set Python environment variables to avoid `.pyc` files and improve container logging.
+- Created and used a non-root `appuser` for better container security.
+- Used `COPY --chown=appuser:appuser` so files are owned by the non-root user.
 
 ### Explanation
 
-The Dockerfile creates a lightweight image for the Node.js application. The app serves the static `index.html` page through `server.js` on port `3000`. The image is optimized by using an Alpine base image, excluding unnecessary files, and running the application as a non-root user.
+The Dockerfile creates a lightweight image for the FastAPI application. The app serves the static `index.html` page through `main.py` on port `8000` and provides a `/health` endpoint for container checks. The image is optimized by using a slim Python base image, excluding unnecessary files, installing dependencies without cache, and running the application as a non-root user.
