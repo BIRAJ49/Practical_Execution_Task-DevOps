@@ -820,3 +820,87 @@ Expected output:
 ### Explanation
 
 I used `docker ps -a` to confirm that the container exited, then used `docker logs` to inspect the startup error. The logs showed that Uvicorn could not import the module `backend.missing`. The fix is to use the correct module path, `backend.main:app`, or update the Dockerfile/Compose command if the wrong path is configured there.
+
+## Question 14: Write a CI/CD YAML File Including Build, Test, and Deploy Stages
+
+### File Created
+
+- `.github/workflows/cicd.yml`: GitHub Actions CI/CD workflow with build, test, and deploy stages.
+
+### CI/CD Workflow
+
+```yaml
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare environment file
+        run: |
+          cp .env.example .env
+
+      - name: Validate Docker Compose configuration
+        run: |
+          docker compose config
+
+      - name: Build Docker image
+        run: |
+          docker build -t devops-practical-app .
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: Run unit tests
+        run: |
+          python -m unittest discover -s backend -p "test_*.py"
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Simulate deployment
+        run: |
+          echo "Deploying application from main branch..."
+          echo "Deployment stage completed successfully."
+```
+
+### Stages
+
+- `build`: Validates Docker Compose configuration and builds the Docker image.
+- `test`: Installs dependencies and runs backend unit tests.
+- `deploy`: Runs only on the `main` branch after tests pass and simulates deployment.
+
+### Explanation
+
+This CI/CD workflow separates the pipeline into clear build, test, and deploy stages. The `test` stage depends on the `build` stage, and the `deploy` stage depends on the `test` stage. This prevents deployment if the build or tests fail. In a real production setup, the deploy step could be replaced with Netlify, SSH, Kubernetes, or cloud deployment commands using GitHub Secrets.
