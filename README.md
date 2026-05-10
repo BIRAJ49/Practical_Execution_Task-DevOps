@@ -146,13 +146,15 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
 
-RUN adduser --disabled-password --gecos "" appuser
+RUN adduser --disabled-password --gecos "" --no-create-home appuser
 
 COPY backend/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
 COPY --chown=appuser:appuser backend ./backend
 COPY --chown=appuser:appuser frontend ./frontend
@@ -176,9 +178,11 @@ docker run -p 8000:8000 devops-practical-app
 - Used `python:3.12-slim`, which is smaller than a full Python image.
 - Copied only required files into the image.
 - Used `.dockerignore` to exclude Git files, screenshots, logs, environment files, and dependencies.
-- Used `pip install --no-cache-dir` to avoid storing package cache in the image.
+- Set `PIP_NO_CACHE_DIR=1` to avoid storing pip cache in the image.
+- Set `PIP_DISABLE_PIP_VERSION_CHECK=1` to reduce unnecessary pip output and checks.
 - Set Python environment variables to avoid `.pyc` files and improve container logging.
 - Created and used a non-root `appuser` for better container security.
+- Used `--no-create-home` to avoid creating an unnecessary home directory for the container user.
 - Used `COPY --chown=appuser:appuser` so files are owned by the non-root user.
 
 ### Explanation
