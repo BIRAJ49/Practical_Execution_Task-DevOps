@@ -901,6 +901,52 @@ jobs:
 - `test`: Installs dependencies and runs backend unit tests.
 - `deploy`: Runs only on the `main` branch after tests pass and simulates deployment.
 
+### Proof Screenshot
+
+CI/CD workflow completed successfully:
+
+<img src="screenshoot/cicd-workflow.png" alt="CI/CD workflow success" width="600">
+
 ### Explanation
 
 This CI/CD workflow separates the pipeline into clear build, test, and deploy stages. The `test` stage depends on the `build` stage, and the `deploy` stage depends on the `test` stage. This prevents deployment if the build or tests fail. In a real production setup, the deploy step could be replaced with Netlify, SSH, Kubernetes, or cloud deployment commands using GitHub Secrets.
+
+## Question 15: Explain the End-to-End Deployment Lifecycle and Identify Possible Failure Points
+
+### End-to-End Deployment Lifecycle
+
+1. Code is developed for the frontend and backend application.
+2. Code is committed to Git with proper commit messages.
+3. Code is pushed to GitHub.
+4. Developers use feature branches, merge into `develop`, and merge stable code into `main`.
+5. GitHub Actions runs the CI pipeline.
+6. The pipeline installs dependencies and runs tests.
+7. Docker builds the application image using the `Dockerfile`.
+8. Environment variables are configured securely using `.env`, `.env.example`, and GitHub Secrets when needed.
+9. Docker Compose starts the application, database, and Nginx containers.
+10. Nginx acts as a reverse proxy and forwards requests to the FastAPI backend.
+11. The static frontend is deployed to Netlify.
+12. Health checks and logs are used to verify that the application is working.
+
+### Possible Failure Points
+
+- Wrong Git branch used for development or deployment.
+- Merge conflict not resolved correctly.
+- GitHub Actions workflow fails.
+- Unit tests fail.
+- Docker image build fails.
+- Docker daemon is not running.
+- Missing or incorrect environment variables.
+- Database credentials are wrong.
+- Database container is unhealthy.
+- Application container fails to start.
+- Wrong FastAPI module path used in the container command.
+- Port `8000` or `8080` is already in use.
+- Nginx reverse proxy is misconfigured.
+- Netlify publish directory is set incorrectly.
+- Health check endpoint fails.
+- Logs show application or proxy errors.
+
+### Explanation
+
+The deployment lifecycle starts from writing code, committing it to GitHub, running CI tests, building a Docker image, configuring environment variables, deploying containers using Docker Compose, routing traffic through Nginx, and deploying the frontend to Netlify. At each stage, failures can happen, so CI results, container status, health checks, and logs are used to identify and fix issues.
