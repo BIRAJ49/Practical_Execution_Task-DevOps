@@ -185,6 +185,16 @@ docker run -p 8000:8000 devops-practical-app
 - Used `--no-create-home` to avoid creating an unnecessary home directory for the container user.
 - Used `COPY --chown=appuser:appuser` so files are owned by the non-root user.
 
+### Proof Screenshots
+
+Docker image build completed successfully:
+
+<img src="screenshoot/docker-build-success.png" alt="Docker build success" width="600">
+
+Docker container running successfully:
+
+<img src="screenshoot/docker-container-running.png" alt="Docker container running" width="600">
+
 ### Explanation
 
 The Dockerfile creates a lightweight image for the FastAPI application. The app serves the static `frontend/index.html` page through `backend/main.py` on port `8000` and provides a `/health` endpoint for container checks. The image is optimized by using a slim Python base image, excluding unnecessary files, installing dependencies without cache, and running the application as a non-root user.
