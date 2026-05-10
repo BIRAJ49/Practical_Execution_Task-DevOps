@@ -754,3 +754,69 @@ The logs showed successful startup and `200 OK` responses, so there was no curre
 ### Explanation
 
 I analyzed logs using `docker compose logs` for the app, Nginx, and database services. The logs helped confirm that containers started correctly and requests were successfully handled. If a failure occurred, these logs would help identify whether the issue was caused by the application, reverse proxy, database, port conflict, or missing environment variables.
+
+## Question 13: Debug a Failing Container Using Logs and Propose a Fix
+
+### File Created
+
+- `container-debug-notes.md`: Contains the failing container command, logs, root cause, and proposed fix.
+
+### Failure Scenario
+
+I created a failing container by starting the FastAPI app with an incorrect module path:
+
+```bash
+docker run --name devops-practical-log-debug devops_practical-app uvicorn backend.missing:app --host 0.0.0.0 --port 8000
+```
+
+### Debug Commands Used
+
+```bash
+docker ps -a
+docker logs devops-practical-log-debug
+docker inspect devops-practical-log-debug
+```
+
+### Log Output
+
+```text
+ERROR: Error loading ASGI app. Could not import module "backend.missing".
+```
+
+### Root Cause
+
+The container failed because the startup command referenced a module that does not exist:
+
+```text
+backend.missing:app
+```
+
+The correct FastAPI application module is:
+
+```text
+backend.main:app
+```
+
+### Proposed Fix
+
+Run the container with the correct Uvicorn command:
+
+```bash
+docker run -d --name devops-practical-fixed -p 8000:8000 devops_practical-app uvicorn backend.main:app --host 0.0.0.0 --port 8000
+```
+
+Then verify the application:
+
+```bash
+curl http://localhost:8000/health
+```
+
+Expected output:
+
+```json
+{"status":"ok"}
+```
+
+### Explanation
+
+I used `docker ps -a` to confirm that the container exited, then used `docker logs` to inspect the startup error. The logs showed that Uvicorn could not import the module `backend.missing`. The fix is to use the correct module path, `backend.main:app`, or update the Dockerfile/Compose command if the wrong path is configured there.
