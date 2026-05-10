@@ -590,3 +590,74 @@ Environment variables are configured securely and `.env` is ignored by Git:
 ### Explanation
 
 Sensitive values should not be hardcoded in application code or committed to GitHub. I used `.env.example` to document required variables and `.gitignore` to prevent the real `.env` file from being committed. Docker Compose loads the variables from `.env` and passes them to the application. The `/config` endpoint only confirms whether values are configured; it does not expose the actual database password or secret key.
+
+## Question 10: Set Up Nginx as a Reverse Proxy for a Backend Service
+
+### Files Created or Updated
+
+- `nginx/default.conf`: Nginx reverse proxy configuration.
+- `docker-compose.yml`: Added an `nginx` service.
+
+### Nginx Configuration
+
+```nginx
+server {
+    listen 80;
+    server_name localhost;
+
+    location / {
+        proxy_pass http://app:8000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+### Docker Compose Service
+
+```yaml
+nginx:
+  image: nginx:1.27-alpine
+  container_name: devops-practical-nginx
+  ports:
+    - "8080:80"
+  volumes:
+    - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+  depends_on:
+    - app
+  restart: unless-stopped
+```
+
+### Commands Used
+
+Start the services:
+
+```bash
+docker compose up --build
+```
+
+Check that Nginx is running:
+
+```bash
+docker compose ps
+```
+
+Test the reverse proxy:
+
+```bash
+curl http://localhost:8080/health
+curl http://localhost:8080/config
+```
+
+Check Nginx logs:
+
+```bash
+docker compose logs nginx
+```
+
+### Explanation
+
+Nginx runs as a separate container and acts as a reverse proxy in front of the FastAPI backend. Requests sent to `localhost:8080` are received by Nginx and forwarded internally to the `app` service at `http://app:8000`. This keeps the backend behind a proxy layer and demonstrates how production traffic can be routed through Nginx.
