@@ -43,21 +43,72 @@ Initial commit: add index.html page
 git branch develop
 git checkout develop
 
-git checkout -b feature/add-html-page
+git checkout -b feature/update-homepage
 git add .
-git commit -m "Add simple HTML page"
+git commit -m "Update homepage content"
 
 git checkout develop
-git merge feature/add-html-page
+git merge feature/update-homepage
 
 git checkout main
 git merge develop
 
 git push origin main
 git push origin develop
-git push origin feature/add-html-page
+git push origin feature/update-homepage
 ```
 
 ### Explanation
 
-First, I created a `develop` branch from `main`. Then I created a feature branch named `feature/add-html-page` from `develop` to simulate a developer working on a new feature. After completing the work, I committed the changes and merged the feature branch into `develop`. Finally, I merged `develop` into `main` to simulate releasing stable code.
+First, I created a `develop` branch from `main`. Then I created a feature branch named `feature/update-homepage` from `develop` to simulate a developer working on a new feature. After completing the work, I committed the changes and merged the feature branch into `develop`. Finally, I merged `develop` into `main` to simulate releasing stable code.
+
+## Question 3: Resolve a Merge Conflict Scenario and Document the Steps Taken
+
+### Scenario
+
+A merge conflict was created by editing the same heading line in `index.html` on two different branches:
+
+- `conflict-change-a`
+- `conflict-change-b`
+
+### Commands Used
+
+```bash
+git checkout -b conflict-change-a
+git add index.html
+git commit -m "Update heading from first conflict branch"
+
+git checkout main
+git checkout -b conflict-change-b
+git add index.html
+git commit -m "Update heading from second conflict branch"
+
+git checkout main
+git merge conflict-change-a
+git merge conflict-change-b
+```
+
+The second merge created a conflict in `index.html`.
+
+### Conflict Resolution Steps
+
+```bash
+git status
+```
+
+I opened `index.html`, removed the conflict markers, and kept the final correct heading:
+
+```html
+<h1>Welcome to My DevOps Practical Website</h1>
+```
+
+Then I added and committed the resolved file:
+
+```bash
+git add index.html
+git commit -m "Resolve homepage heading merge conflict"
+```
+
+### Explanation
+
+The conflict happened because two branches changed the same line in `index.html`. Git could not decide which change to keep, so I manually edited the file, removed the conflict markers, kept the correct final heading, staged the file, and committed the merge conflict resolution.
