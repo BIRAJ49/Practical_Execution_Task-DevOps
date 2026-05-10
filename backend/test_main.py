@@ -12,6 +12,7 @@ class AppTestCase(unittest.TestCase):
 
         self.assertIn("database_configured", response)
         self.assertIn("database_host", response)
+        self.assertIn("secret_key_configured", response)
         self.assertEqual(response["database_host"], "database")
 
 

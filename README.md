@@ -518,3 +518,75 @@ Deployment automation script completed successfully:
 ### Explanation
 
 The script automates a repetitive deployment setup. It checks whether Docker is installed and running, creates `.env` from `.env.example` if needed, validates the Docker Compose file, builds and starts the containers, waits for the FastAPI health check, and shows logs if the application fails to become healthy.
+
+## Question 9: Configure Environment Variables Securely for an Application
+
+### Files Used
+
+- `.env.example`: Template file showing required environment variables.
+- `.gitignore`: Ignores the real `.env` file so secrets are not committed.
+- `docker-compose.yml`: Loads environment variables into the containers.
+- `backend/main.py`: Reads environment variables from the container environment.
+
+### Environment Template
+
+```env
+APP_ENV=development
+SECRET_KEY=change_this_secret_key
+POSTGRES_USER=devops_user
+POSTGRES_PASSWORD=change_this_password
+POSTGRES_DB=devops_db
+```
+
+### Secure Setup Commands
+
+Create a real local `.env` file from the example:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and replace placeholder values:
+
+```bash
+nano .env
+```
+
+Confirm `.env` is ignored by Git:
+
+```bash
+git status --short
+```
+
+Start the application with Docker Compose:
+
+```bash
+docker compose up --build
+```
+
+Verify that the app can read the environment configuration without exposing secret values:
+
+```bash
+curl http://localhost:8000/config
+```
+
+Expected output:
+
+```json
+{
+  "app_environment": "development",
+  "database_configured": true,
+  "database_host": "database",
+  "secret_key_configured": true
+}
+```
+
+### Proof Screenshot
+
+Environment variables are configured securely and `.env` is ignored by Git:
+
+<img src="screenshoot/environment-variable-config.png" alt="Secure environment variable configuration" width="600">
+
+### Explanation
+
+Sensitive values should not be hardcoded in application code or committed to GitHub. I used `.env.example` to document required variables and `.gitignore` to prevent the real `.env` file from being committed. Docker Compose loads the variables from `.env` and passes them to the application. The `/config` endpoint only confirms whether values are configured; it does not expose the actual database password or secret key.

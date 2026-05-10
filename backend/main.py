@@ -29,6 +29,8 @@ def health():
 @app.get("/config")
 def config():
     return {
+        "app_environment": os.getenv("APP_ENV", "development"),
         "database_configured": bool(os.getenv("DATABASE_URL")),
         "database_host": "database",
+        "secret_key_configured": bool(os.getenv("SECRET_KEY")),
     }
