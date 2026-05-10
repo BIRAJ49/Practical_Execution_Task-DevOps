@@ -667,3 +667,29 @@ Nginx reverse proxy forwarding requests to the FastAPI backend:
 ### Explanation
 
 Nginx runs as a separate container and acts as a reverse proxy in front of the FastAPI backend. Requests sent to `localhost:8080` are received by Nginx and forwarded internally to the `app` service at `http://app:8000`. This keeps the backend behind a proxy layer and demonstrates how production traffic can be routed through Nginx.
+
+## Question 11: Deploy a Static Frontend on Netlify
+
+### Deployment URL
+
+```text
+https://devopspracticaltask.netlify.app
+```
+
+### Deployment Steps
+
+1. Logged in to Netlify.
+2. Created a new site.
+3. Uploaded or connected the static frontend from the `frontend` folder.
+4. Set the publish directory to `frontend`.
+5. Deployed the site and verified it in the browser.
+
+### Proof Screenshot
+
+Static frontend deployed successfully on Netlify:
+
+<img src="screenshoot/netlify-deployment.png" alt="Netlify static frontend deployment" width="600">
+
+### Explanation
+
+The static frontend was deployed on Netlify so it can be accessed publicly through a live URL. Netlify serves the `frontend/index.html` page as a static website, which is suitable for simple HTML, CSS, and JavaScript frontend deployments.
