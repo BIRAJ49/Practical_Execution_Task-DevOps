@@ -125,3 +125,53 @@ Document merge conflict resolution steps
 ### Explanation
 
 The conflict happened because two branches changed the same line in `index.html`. Git could not decide which change to keep, so I manually edited the file, removed the conflict markers, kept the correct final heading, staged the file, and committed the merge conflict resolution.
+
+## Question 4: Write a Dockerfile for an Application with Optimization and Small Image Size
+
+### Files Created
+
+- `server.js`: Simple Node.js server that serves `index.html`.
+- `package.json`: Contains application metadata and start/test scripts.
+- `Dockerfile`: Builds the application container image.
+- `.dockerignore`: Removes unnecessary files from the Docker build context.
+
+### Dockerfile
+
+```dockerfile
+FROM node:22-alpine
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+COPY --chown=node:node package.json ./
+COPY --chown=node:node server.js ./
+COPY --chown=node:node index.html ./
+
+USER node
+
+EXPOSE 3000
+
+CMD ["node", "server.js"]
+```
+
+### Commands Used
+
+```bash
+docker build -t devops-practical-app .
+docker run -p 3000:3000 devops-practical-app
+```
+
+### Optimization Steps
+
+- Used `node:22-alpine`, which is smaller than a full Node.js image.
+- Copied only required files into the image.
+- Used `.dockerignore` to exclude Git files, screenshots, logs, environment files, and dependencies.
+- Set `NODE_ENV=production`.
+- Used the non-root `node` user for better container security.
+- Used `COPY --chown=node:node` so files are owned by the non-root user.
+- Avoided unnecessary dependencies, which keeps the image smaller.
+
+### Explanation
+
+The Dockerfile creates a lightweight image for the Node.js application. The app serves the static `index.html` page through `server.js` on port `3000`. The image is optimized by using an Alpine base image, excluding unnecessary files, and running the application as a non-root user.

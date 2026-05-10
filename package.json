@@ -1,0 +1,17 @@
+{
+  "name": "devops-practical-app",
+  "version": "1.0.0",
+  "description": "Simple web application for DevOps practical tasks.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node -e \"require('fs').accessSync('index.html'); require('fs').accessSync('server.js'); console.log('Tests passed')\""
+  },
+  "keywords": [
+    "devops",
+    "docker",
+    "github-actions"
+  ],
+  "author": "Biraj",
+  "license": "MIT"
+}
